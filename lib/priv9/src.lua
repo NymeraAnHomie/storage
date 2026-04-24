@@ -63,7 +63,7 @@
 
 -- Library init
     getgenv().library = {
-        directory = "priv9",
+        directory = "awesomehack",
         folders = {
             "/fonts",
             "/configs",
@@ -78,6 +78,7 @@
             player = {}, 
         },
         colorpicker_open = false; 
+        config_holder;
         gui; 
     }
     
@@ -393,9 +394,8 @@
             return enum_table
         end
 
-        local config_holder;
         function library:update_config_list() 
-            if not config_holder then 
+            if not library.config_holder then 
                 return 
             end
             
@@ -407,7 +407,7 @@
             end
             
 
-            config_holder.refresh_options(list)
+            library.config_holder.refresh_options(list)
         end 
 
         function library:get_config()
@@ -2482,13 +2482,13 @@
 
             function library:init_config(window) 
                 local textbox;
-                local main = window:tab({name = "Configs"})
-                local section = main:column({}):section({name = "Settings", size = 1, default = true})
-                config_holder = section:dropdown({name = "Configs", options = {"Report", "This", "Error", "To", "Finobe"}, callback = function(option) if textbox then textbox.set(option) end end, flag = "config_name_list"}); library:update_config_list()
-                textbox = section:textbox({name = "Config name:", flag = "config_name_text"})
-                section:button({name = "Save", callback = function() writefile(library.directory .. "/configs/" .. flags["config_name_text"] .. ".cfg", library:get_config()) library:update_config_list() end}) 
-                section:button({name = "Load", callback = function() library:load_config(readfile(library.directory .. "/configs/" .. flags["config_name_text"] .. ".cfg"))  library:update_config_list() end})
-                section:button({name = "Delete", callback = function() delfile(library.directory .. "/configs/" .. flags["config_name_text"] .. ".cfg")  library:update_config_list() end})
+                local main = window:tab({name = "configs"})
+                local section = main:column({}):section({name = "settings", size = 1, default = true})
+                library.config_holder = section:dropdown({name = "configs", options = {"Report", "This", "Error", "To", "Finobe"}, callback = function(option) if textbox then textbox.set(option) end end, flag = "config_name_list"}); library:update_config_list()
+                textbox = section:textbox({name = "config name:", flag = "config_name_text"})
+                section:button({name = "save", callback = function() writefile(library.directory .. "/configs/" .. flags["config_name_text"] .. ".cfg", library:get_config()) library:update_config_list() end}) 
+                section:button({name = "load", callback = function() library:load_config(readfile(library.directory .. "/configs/" .. flags["config_name_text"] .. ".cfg"))  library:update_config_list() end})
+                section:button({name = "delete", callback = function() delfile(library.directory .. "/configs/" .. flags["config_name_text"] .. ".cfg")  library:update_config_list() end})
 
                 local section = main:column({}):section({name = "Other", size = 1, default = true})
                 section:keybind({name = "Menu bind", callback = function(bool) window.toggle_menu(bool) end, default = true})
@@ -2537,8 +2537,6 @@
                         rgbkey(1, themes.preset["3"]),
                     };
                 end, color = themes.preset["3"]})
-
-                main:column({})
             end
         -- 
     -- 

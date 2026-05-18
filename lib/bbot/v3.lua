@@ -4007,35 +4007,37 @@
                 Cfg.Callback(Flags[Cfg.Flag]) 
             end
             
-            function Cfg.RefreshOptions(options) 
-                for _,option in Cfg.OptionInstances do 
-                    option:Destroy() 
+            function Cfg.RefreshOptions(options)
+                for _, option in ipairs(Cfg.OptionInstances) do
+                    option:Destroy()
                 end
-                
-                Cfg.OptionInstances = {} 
 
-                for _,option in options do
+                Cfg.OptionInstances = {}
+                Cfg.Options = options
+
+                for _, option in ipairs(options) do
                     local Button = Cfg.RenderOption(option)
-                    
+
                     Button.MouseButton1Down:Connect(function()
-                        if Cfg.Multi then 
-                            local Selected = table.find(Cfg.MultiItems, Button.Text)
-                            
-                            if Selected then 
-                                table.remove(Cfg.MultiItems, Selected)
+                        if Cfg.Multi then
+                            local selected = table.find(Cfg.MultiItems, Button.Text)
+
+                            if selected then
+                                table.remove(Cfg.MultiItems, selected)
                             else
                                 table.insert(Cfg.MultiItems, Button.Text)
                             end
-                            
-                            Cfg.Set(Cfg.MultiItems) 				
-                        else 
+
+                            Cfg.Set(Cfg.MultiItems)
+                        else
                             Cfg.SetVisible(false)
                             Cfg.Open = false
-                            
                             Cfg.Set(Button.Text)
                         end
                     end)
                 end
+
+                Cfg.Set(Cfg.Multi and Cfg.MultiItems or Flags[Cfg.Flag])
             end
 
             function Cfg.Tween(bool) 

@@ -332,25 +332,21 @@
             return start * (1 - t) + finish * t
         end
 
-       function Library:ConvertEnum(enum)
-            if typeof(enum) ~= "string" or enum == "NONE" or enum == "" then 
-                return nil 
-            end
-
+        function Library:ConvertEnum(enum)
             local EnumParts = {}
+            
             for part in string.gmatch(enum, "[%w_]+") do
-                table.insert(EnumParts, part)
+                insert(EnumParts, part)
             end
-
+        
             local EnumTable = Enum
-            for i = 2, #EnumParts do
-                if EnumTable[EnumParts[i]] then
-                    EnumTable = EnumTable[EnumParts[i]]
-                else
-                    return nil
-                end
-            end
 
+            for i = 2, #EnumParts do
+                local EnumItem = EnumTable[EnumParts[i]]
+        
+                EnumTable = EnumItem
+            end
+            
             return EnumTable
         end
 
@@ -1244,7 +1240,7 @@
             local Config = {}
             
             for Idx, Value in Flags do
-                if type(Value) == "table" and Value.Key then
+                if type(Value) == "table" and Value.key then
                     Config[Idx] = {
                         Active = Value.Active,
                         Mode = Value.Mode,
@@ -4007,37 +4003,35 @@
                 Cfg.Callback(Flags[Cfg.Flag]) 
             end
             
-            function Cfg.RefreshOptions(options)
-                for _, option in ipairs(Cfg.OptionInstances) do
-                    option:Destroy()
+            function Cfg.RefreshOptions(options) 
+                for _,option in Cfg.OptionInstances do 
+                    option:Destroy() 
                 end
+                
+                Cfg.OptionInstances = {} 
 
-                Cfg.OptionInstances = {}
-                Cfg.Options = options
-
-                for _, option in ipairs(options) do
+                for _,option in options do
                     local Button = Cfg.RenderOption(option)
-
+                    
                     Button.MouseButton1Down:Connect(function()
-                        if Cfg.Multi then
-                            local selected = table.find(Cfg.MultiItems, Button.Text)
-
-                            if selected then
-                                table.remove(Cfg.MultiItems, selected)
+                        if Cfg.Multi then 
+                            local Selected = table.find(Cfg.MultiItems, Button.Text)
+                            
+                            if Selected then 
+                                table.remove(Cfg.MultiItems, Selected)
                             else
                                 table.insert(Cfg.MultiItems, Button.Text)
                             end
-
-                            Cfg.Set(Cfg.MultiItems)
-                        else
+                            
+                            Cfg.Set(Cfg.MultiItems) 				
+                        else 
                             Cfg.SetVisible(false)
                             Cfg.Open = false
+                            
                             Cfg.Set(Button.Text)
                         end
                     end)
                 end
-
-                Cfg.Set(Cfg.Multi and Cfg.MultiItems or Flags[Cfg.Flag])
             end
 
             function Cfg.Tween(bool) 
@@ -4553,16 +4547,13 @@
                     Cfg.Mode = input
                     Cfg.SetMode(Cfg.Mode) 
                 elseif type(input) == "table" then
-                    local savedKey = input.Key
-                    
-                    if type(savedKey) == "string" and savedKey ~= "NONE" then
-                        input.Key = Library:ConvertEnum(savedKey)
-                    end
+                    input.Key = type(input.Key) == "string" and input.Key ~= "NONE" and Library:ConvertEnum(input.key) or input.Key
+                    input.Key = input.Key == Enum.KeyCode.Escape and "NONE" or input.Key
 
                     Cfg.Key = input.Key or "NONE"
                     Cfg.Mode = input.Mode or "Toggle"
 
-                    if input.Active ~= nil then
+                    if input.Active then
                         Cfg.Active = input.Active
                     end
 

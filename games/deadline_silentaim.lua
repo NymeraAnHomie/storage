@@ -1,5 +1,6 @@
 local Config = {
     Enabled = true,
+    HitChance = 100,
     MaxDistance = 300,
     BulletOffset = Vector3.new(0, 0, 0),
     BulletSpeed = 1000,
@@ -67,11 +68,14 @@ old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, dir
         return old_fire_server(self_param, origin_pos, direction, data, ...)
     end
 
-    local closest_player = get_closest_player()
-    if closest_player then
-        origin_pos += Config.BulletOffset
-        local target_pos = closest_player[Config.TargetPart].Position
-        direction = (target_pos - origin_pos).Unit * Config.BulletSpeed
+    local roll = math.random(1, 100)
+    if roll <= Config.HitChance then
+        local closest_player = get_closest_player()
+        if closest_player then
+            origin_pos += Config.BulletOffset
+            local target_pos = closest_player[Config.TargetPart].Position
+            direction = (target_pos - origin_pos).Unit * Config.BulletSpeed
+        end
     end
     
     return old_fire_server(self_param, origin_pos, direction, data, ...)

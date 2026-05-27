@@ -1,3 +1,4 @@
+-- much luv w/ dementiaenjoyer <3
 local config = {
     enabled = true,
     hit_chance = 100,

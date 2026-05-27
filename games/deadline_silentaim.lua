@@ -75,24 +75,27 @@ for _, upvalue in debug.getupvalues(caster.fire) do
 end
 
 old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, direction, data, ...)
-    if not config.enabled then
-        return old_fire_server(self_param, origin_pos, direction, data, ...)
-    end
-
     local closest_player = nil
-    local roll = math.random(1, 100)
     
-    if roll <= config.hit_chance then
-        closest_player = get_closest_player()
-        if closest_player then
-            origin_pos += config.bullet_offset
-            local target_pos = closest_player[config.target_part].Position
-            
-            local speed = config.use_custom_speed and config.bullet_speed or direction.Magnitude
-            direction = (target_pos - origin_pos).Unit * speed
+    if config.enabled then
+        local roll = math.random(1, 100)
+        
+        if roll <= config.hit_chance then
+            closest_player = get_closest_player()
+            if closest_player then
+                origin_pos += config.bullet_offset
+                local target_pos = closest_player[config.target_part].Position
+                
+                local speed = config.use_custom_speed and config.bullet_speed or direction.Magnitude
+                direction = (target_pos - origin_pos).Unit * speed
+            end
+        elseif config.use_custom_speed then
+            direction = direction.Unit * config.bullet_speed
         end
-    elseif config.use_custom_speed then
-        direction = direction.Unit * config.bullet_speed
+    else
+        if config.use_custom_speed then
+            direction = direction.Unit * config.bullet_speed
+        end
     end
     
     if typeof(config.on_shoot) == "function" then

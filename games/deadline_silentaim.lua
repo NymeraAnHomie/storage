@@ -1,18 +1,22 @@
 -- forever w/ dementiaenjoyer luv <3
-local Config = {
-    Enabled = true,
-    HitChance = 100,
-    MaxDistance = 300,
-    BulletOffset = Vector3.new(0, 0, 0),
+local config = {
+    enabled = true,
+    hit_chance = 100,
+    max_distance = 300,
+    bullet_offset = Vector3.new(0, 0, 0),
     
-    TargetPart = "head",
-    CharacterFolder = "characters",
+    target_part = "head",
+    character_folder = "characters",
 
-    UseCustomSpeed = true,
-    BulletSpeed = 1000,
+    use_custom_speed = true,
+    bullet_speed = 1000,
     
-    UseMultishot = true,
-    BulletAmount = 3
+    use_multishot = true,
+    bullet_amount = 3,
+
+    on_shoot = function(target_player, origin, direction)
+        
+    end
 }
 
 local replicated_storage = game:GetService("ReplicatedStorage")
@@ -21,14 +25,14 @@ local modules = {}
 local old_fire_server = nil
 
 local function get_closest_player()
-    local closest_distance = Config.MaxDistance
+    local closest_distance = config.max_distance
     local closest_player = nil
-    local char_folder = workspace:FindFirstChild(Config.CharacterFolder)
+    local char_folder = workspace:FindFirstChild(config.character_folder)
     
     if not char_folder then return nil end
 
     for _, player in char_folder:GetChildren() do
-        if not player:FindFirstChild("hitbox") or not player:FindFirstChild(Config.TargetPart) then
+        if not player:FindFirstChild("hitbox") or not player:FindFirstChild(config.target_part) then
             continue
         end
         
@@ -71,26 +75,32 @@ for _, upvalue in debug.getupvalues(caster.fire) do
 end
 
 old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, direction, data, ...)
-    if not Config.Enabled then
+    if not config.enabled then
         return old_fire_server(self_param, origin_pos, direction, data, ...)
     end
 
+    local closest_player = nil
     local roll = math.random(1, 100)
-    if roll <= Config.HitChance then
-        local closest_player = get_closest_player()
+    
+    if roll <= config.hit_chance then
+        closest_player = get_closest_player()
         if closest_player then
-            origin_pos += Config.BulletOffset
-            local target_pos = closest_player[Config.TargetPart].Position
+            origin_pos += config.bullet_offset
+            local target_pos = closest_player[config.target_part].Position
             
-            local speed = Config.UseCustomSpeed and Config.BulletSpeed or direction.Magnitude
+            local speed = config.use_custom_speed and config.bullet_speed or direction.Magnitude
             direction = (target_pos - origin_pos).Unit * speed
         end
-    elseif Config.UseCustomSpeed then
-        direction = direction.Unit * Config.BulletSpeed
+    elseif config.use_custom_speed then
+        direction = direction.Unit * config.bullet_speed
     end
     
-    if Config.UseMultishot and Config.BulletAmount > 1 then
-        for i = 1, (Config.BulletAmount - 1) do
+    if typeof(config.on_shoot) == "function" then
+        task.spawn(config.on_shoot, closest_player, origin_pos, direction)
+    end
+    
+    if config.use_multishot and config.bullet_amount > 1 then
+        for i = 1, (config.bullet_amount - 1) do
             old_fire_server(self_param, origin_pos, direction, data, ...)
         end
     end
@@ -98,4 +108,4 @@ old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, dir
     return old_fire_server(self_param, origin_pos, direction, data, ...)
 end)
 
-return Config
+return config

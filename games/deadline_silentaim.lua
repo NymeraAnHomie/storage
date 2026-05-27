@@ -1,3 +1,4 @@
+-- forever w/ dementiaenjoyer luv <3
 local Config = {
     Enabled = true,
     HitChance = 100,

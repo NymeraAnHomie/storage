@@ -1,4 +1,3 @@
--- forever w/ dementiaenjoyer luv <3
 local config = {
     enabled = true,
     hit_chance = 100,
@@ -14,7 +13,7 @@ local config = {
     use_multishot = true,
     bullet_amount = 3,
 
-    on_shoot = function(target_player, origin, direction)
+    on_shoot = function(target_player, self_param, data, origin, direction, ...)
         
     end
 }
@@ -88,9 +87,17 @@ old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, dir
                 
                 local speed = config.use_custom_speed and config.bullet_speed or direction.Magnitude
                 direction = (target_pos - origin_pos).Unit * speed
+                
+                -- Update internal data table velocity if it exists
+                if type(data) == "table" and data.Velocity then
+                    data.Velocity = direction
+                end
             end
         elseif config.use_custom_speed then
             direction = direction.Unit * config.bullet_speed
+            if type(data) == "table" and data.Velocity then
+                data.Velocity = direction
+            end
         end
     else
         if config.use_custom_speed then
@@ -99,7 +106,7 @@ old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, dir
     end
     
     if typeof(config.on_shoot) == "function" then
-        task.spawn(config.on_shoot, closest_player, origin_pos, direction)
+        task.spawn(config.on_shoot, closest_player, self_param, data, origin_pos, direction, ...)
     end
     
     if config.use_multishot and config.bullet_amount > 1 then

@@ -3,9 +3,15 @@ local Config = {
     HitChance = 100,
     MaxDistance = 300,
     BulletOffset = Vector3.new(0, 0, 0),
-    BulletSpeed = 1000,
+    
     TargetPart = "head",
-    CharacterFolder = "characters"
+    CharacterFolder = "characters",
+
+    UseCustomSpeed = true,
+    BulletSpeed = 1000,
+    
+    UseMultishot = true,
+    BulletAmount = 3
 }
 
 local replicated_storage = game:GetService("ReplicatedStorage")
@@ -74,7 +80,17 @@ old_fire_server = hookfunction(caster.fire, function(self_param, origin_pos, dir
         if closest_player then
             origin_pos += Config.BulletOffset
             local target_pos = closest_player[Config.TargetPart].Position
-            direction = (target_pos - origin_pos).Unit * Config.BulletSpeed
+            
+            local speed = Config.UseCustomSpeed and Config.BulletSpeed or direction.Magnitude
+            direction = (target_pos - origin_pos).Unit * speed
+        end
+    elseif Config.UseCustomSpeed then
+        direction = direction.Unit * Config.BulletSpeed
+    end
+    
+    if Config.UseMultishot and Config.BulletAmount > 1 then
+        for i = 1, (Config.BulletAmount - 1) do
+            old_fire_server(self_param, origin_pos, direction, data, ...)
         end
     end
     

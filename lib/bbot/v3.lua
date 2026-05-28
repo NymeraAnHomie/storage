@@ -3425,7 +3425,7 @@
                     
                     -- Elements
                         Items.Group = Library:Create( "Frame" , {
-                            LayoutOrder = 2;
+                            LayoutOrder = 0;
                             BorderColor3 = rgb(0, 0, 0);
                             Parent = Library.Other;
                             Name = "\0";
@@ -4107,7 +4107,7 @@
 
             local Items = Cfg.Items; do 
                 Items.Label = Library:Create( "TextButton" , {
-                    LayoutOrder = 1;
+                    LayoutOrder = 0;
                     FontFace = Library.Font;
                     TextColor3 = rgb(0, 0, 0);
                     BorderColor3 = rgb(0, 0, 0);

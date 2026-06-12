@@ -1,4 +1,4 @@
-local esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/nymeratax/storage/refs/heads/main/esp/sensory/src.lua))()
+local esp = loadstring(game:HttpGet("https://raw.githubusercontent.com/nymeratax/storage/refs/heads/main/esp/sensory/src.lua"))()
 
 esp:Load({
 
